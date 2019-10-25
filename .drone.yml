@@ -20,6 +20,7 @@ steps:
   - env $(cat fqdn_env_file | xargs) /bin/drone-gotemplate
   environment:
     PLUGIN_GLOBS: "deploy/*"
+    CERT_DATA: { from_secret: KUBECONFIG_CERT }
     # API_SERVER: { from_secret: API_SERVER }
     # KUBERNETES_TOKEN: { from_secret: KUBERNETES_TOKEN }
     # TLS_CERT: { from_secret: TLS_CERT }
