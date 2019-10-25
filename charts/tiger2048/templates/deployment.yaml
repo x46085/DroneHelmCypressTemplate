@@ -1,0 +1,79 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ include "tiger2048.fullname" . }}
+  labels:
+    app: {{ include "tiger2048.name" . }}
+    chart: {{ include "tiger2048.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "tiger2048.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "tiger2048.name" . }}
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- if .Values.image.digest | default "" }}
+          image: "{{ .Values.image.repository }}@{{ .Values.image.digest }}"
+          {{- else }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          {{- end }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          env:
+          {{- /* This is because range doesn't support .Values */ -}}
+          {{- $root := . -}}
+          {{- range $key, $value := .Values.env }}
+            - name: {{ $key | quote }}
+              {{- if eq (kindOf $value) "map" }}
+              valueFrom:
+                {{- if $value.fromSecret }}
+                secretKeyRef:
+                  {{- if $value.existingSecretName }}
+                  name:  {{ $value.existingSecretName }}
+                  {{- else if $root.existingSecretName }}
+                  name: {{ $root.existingSecretName }}
+                  {{- else }}
+                  name: {{ template "tiger2048.fullname" $root }}
+                  {{- end }}
+                  key: {{ $value.key }}
+                {{- end }}
+              {{- else }}
+              value: {{ $value | quote }}
+              {{- end }}
+          {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          securityContext:
+            runAsUser: 1001
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}

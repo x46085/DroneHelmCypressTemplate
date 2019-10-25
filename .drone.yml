@@ -1,0 +1,54 @@
+kind: pipeline
+name: build
+
+volumes:
+- name: docker-socket
+  host:
+    path: /var/run/docker.sock
+
+steps:
+- name: check-build
+  image: bashell/alpine-bash:latest
+  commands:
+  - ./scripts/echo_drone_env.sh
+  - ./scripts/determine_url.sh
+
+- name: render-deploy-templates
+  image: x46085/drone-helm-values-apply:24oct19
+  depends_on: [ check-build ]
+  commands:
+  - env $(cat fqdn_env_file | xargs) /bin/drone-gotemplate
+  environment:
+    PLUGIN_GLOBS: "deploy/*"
+    # API_SERVER: { from_secret: API_SERVER }
+    # KUBERNETES_TOKEN: { from_secret: KUBERNETES_TOKEN }
+    # TLS_CERT: { from_secret: TLS_CERT }
+    # TLS_KEY: { from_secret: TLS_KEY }
+
+- name: build-tiger2048
+  image: docker:18.06.1-ce-dind
+  depends_on: [ check-build ]
+  commands:
+  - ./scripts/drone-build-push-image.sh $PACKAGE_NAME
+  environment:
+    PACKAGE_NAME: tiger2048
+  volumes:
+  - name: docker-socket
+    path: /var/run/docker.sock
+
+# - name: helm-deploy
+#   image: x46085/k8s-helm-gcp:24oct19
+#   depends_on:
+#   - build-tiger2048
+#   environment:
+#     HELMCONFIG: helm_env_file
+#     CLUSTER_ENV:
+#       from_secret: CLUSTER_ENV
+
+# - name: helm-test
+#   image: x46085/k8s-helm-gcp:24oct19
+#   depends_on: [ helm-deploy ]
+#   environment:
+#     HELMCONFIG: env_file
+#   commands:
+#     - ./scripts/drone-helm-test.sh

@@ -1,0 +1,67 @@
+{{- $branch := .DRONE_BRANCH -}}
+{{- $tag := .DRONE_TAG -}}
+{{- $devBranchDeploy := not ( or ( eq $branch "master" ) $tag ) -}}
+{{- $hostPrefix := .PREFIX -}}
+{{- $midLevelDomain := .MID_LEVEL_DOMAIN -}}
+{{- $sha := .DRONE_COMMIT_SHA | trunc 8 -}}
+{{- $versionTag := $sha | cat "version-" | nospace -}}
+
+tiger2048:
+  enabled: true
+  nameOverride: "tiger2048"
+  fullnameOverride: "tiger2048"
+  env:
+    CLUSTER_ENV: development
+    EXAMPLE_SECRET:
+      fromSecret: true
+      key: exampleSecret
+  secrets:
+    exampleSecret: {{ .EXAMPLE_SECRET | default "" | quote }}
+  image:
+    tag: {{ $versionTag }}
+  service:
+    type: ClusterIP
+    port: 8080
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  {{- if $devBranchDeploy }}
+  tls:
+    certificate: |-
+{{ .TLS_CERT | default "" | indent 6 }}
+    key: |-
+{{ .TLS_KEY | default "" | indent 6 }}
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: nginx
+    hosts:
+      - host: {{ $hostPrefix }}-tiger2048.k8s.{{ $midLevelDomain }}
+        paths:
+          - path: /
+            backend:
+              serviceName: tiger2048
+    tls:
+      - secretName: tiger2048-tls
+        hosts:
+          - {{ $hostPrefix }}-tiger2048.k8s.{{ $midLevelDomain }}
+  {{- else }}
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      kubernetes.io/tls-acme: "true"
+      certmanager.k8s.io/cluster-issuer: letsencrypt
+    hosts:
+      - host: tiger2048.{{ $midLevelDomain }}
+        paths:
+          - path: /
+            backend:
+              serviceName: tiger2048
+    tls:
+      - secretName: tiger2048-root-tls
+        hosts:
+          - tiger2048.{{ $midLevelDomain }}
+  {{- end }}
+  

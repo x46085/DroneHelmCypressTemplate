@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "tiger2048.fullname" . }}
+  labels:
+    app: {{ include "tiger2048.name" . }}
+    chart: {{ include "tiger2048.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ include "tiger2048.name" . }}
+    release: {{ .Release.Name }}

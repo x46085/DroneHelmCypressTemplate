@@ -1,0 +1,16 @@
+.dockerignore
+Dockerfile.*
+node_modules
+**/node_modules/
+*/dist/
+*/coverage/
+*/Dockerfile
+*/.git/
+*/package-lock.json
+*/__pycache__
+
+# Mailman ignores
+mailman/mailman_pb2*
+
+# Task Rabbit ignores
+task-rabbit/task_rabbit_pb2*
