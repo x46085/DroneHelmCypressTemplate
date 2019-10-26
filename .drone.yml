@@ -1,10 +1,10 @@
 kind: pipeline
 name: build
 
-volumes:
-- name: docker-socket
-  host:
-    path: /var/run/docker.sock
+# volumes:
+# - name: docker-socket
+#   host:
+#     path: /var/run/docker.sock
 
 steps:
 - name: check-build
@@ -33,9 +33,9 @@ steps:
   - ./scripts/drone-build-push-image.sh $PACKAGE_NAME
   environment:
     PACKAGE_NAME: tiger2048
-  volumes:
-  - name: docker-socket
-    path: /var/run/docker.sock
+  # volumes:
+  # - name: docker-socket
+  #   path: /var/run/docker.sock
 
 # - name: helm-deploy
 #   image: x46085/k8s-helm-gcp:24oct19
