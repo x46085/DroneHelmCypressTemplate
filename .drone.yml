@@ -30,10 +30,7 @@ steps:
   image: docker:18.06.1-ce-dind
   depends_on: [ check-build ]
   commands:
-  - cd scripts
-  - ls -al
-  - pwd
-  - ./drone-build-push-image.sh $PACKAGE_NAME
+  - /drone/src/scripts/drone-build-push-image.sh $PACKAGE_NAME
   environment:
     PACKAGE_NAME: tiger2048
   # volumes:
