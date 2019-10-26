@@ -28,9 +28,9 @@ steps:
 
 - name: build-tiger2048
   image: docker:18.06.1-ce-dind
-  depends_on: [ check-build ]
+  depends_on: [ render-deploy-templates ]
   commands:
-  - /drone/src/scripts/drone-build-push-image.sh $PACKAGE_NAME
+  - ./scripts/drone-build-push-image.sh $PACKAGE_NAME
   environment:
     PACKAGE_NAME: tiger2048
   # volumes:
