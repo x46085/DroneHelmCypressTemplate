@@ -29,7 +29,7 @@ if [[ "${branch}" != "development" ]]; then
 fi
 
 # `env_file` is sourced into other Drone steps for deployment and running tests
-cat << EOF > env_file
+cat << EOF > fqdn_env_file
 FQDN=${FQDN}
 DOMAIN=${DOMAIN}
 RELEASE=${RELEASE}
