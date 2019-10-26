@@ -11,3 +11,6 @@ go get github.com/Masterminds/sprig
 go get github.com/codegangsta/cli
 go build
 Docker build .
+
+## For Linux / Packaging into the docker container:
+env GOOS=linux GOARCH=amd64 go build
