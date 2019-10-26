@@ -8,7 +8,7 @@ name: build
 
 steps:
 - name: check-build
-  image: bashell/alpine-bash:latest
+  image: x46085/drone-toolbox:24oct19
   commands:
   - ./scripts/echo_drone_env.sh
   - ./scripts/determine_url.sh
