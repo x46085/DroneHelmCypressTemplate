@@ -1,3 +1,3 @@
 FROM alpine:3.8
-ADD drone-gotemplate /bin/
-ENTRYPOINT ["/bin/drone-gotemplate"]
+ADD drone-helm-values-apply /bin/
+ENTRYPOINT ["/bin/drone-helm-values-apply"]

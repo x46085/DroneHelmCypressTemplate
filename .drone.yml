@@ -14,10 +14,10 @@ steps:
   - ./scripts/determine_url.sh
 
 - name: render-deploy-templates
-  image: x46085/drone-helm-values-apply:24oct19
+  image: x46085/drone-helm-values-apply:25oct19
   depends_on: [ check-build ]
   commands:
-  - env $(cat fqdn_env_file | xargs) /bin/drone-gotemplate
+  - env $(cat fqdn_env_file | xargs) /bin/drone-helm-values-apply
   environment:
     PLUGIN_GLOBS: "deploy/*"
     CERT_DATA: { from_secret: KUBECONFIG_CERT }
