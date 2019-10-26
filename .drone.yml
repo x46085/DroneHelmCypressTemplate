@@ -27,7 +27,7 @@ steps:
     # TLS_KEY: { from_secret: TLS_KEY }
 
 - name: build-tiger2048
-  image: x46085/drone-toolbox:24oct19
+  image: x46085/drone-dind:26oct19
   depends_on: [ create-values ]
   commands:
   - ./scripts/drone-build-push-image.sh $PACKAGE_NAME
