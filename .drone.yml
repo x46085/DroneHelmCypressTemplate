@@ -13,7 +13,7 @@ steps:
   - ./scripts/echo_drone_env.sh
   - ./scripts/determine_url.sh
 
-- name: render-deploy-templates
+- name: create-values
   image: x46085/drone-helm-values-apply:25oct19
   depends_on: [ check-build ]
   commands:
@@ -27,8 +27,8 @@ steps:
     # TLS_KEY: { from_secret: TLS_KEY }
 
 - name: build-tiger2048
-  image: docker:18.06.1-ce-dind
-  depends_on: [ render-deploy-templates ]
+  image: x46085/drone-toolbox:24oct19
+  depends_on: [ create-values ]
   commands:
   - ./scripts/drone-build-push-image.sh $PACKAGE_NAME
   environment:
